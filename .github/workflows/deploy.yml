@@ -19,12 +19,11 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: 'bot/package-lock.json'
     
     - name: Install dependencies
       run: |
         cd bot
-        npm ci
+        npm ci || npm install
     
     - name: Run tests (if any)
       run: |
@@ -55,7 +54,7 @@ jobs:
           
           # Устанавливаем зависимости
           cd bot
-          npm ci --production
+          npm ci --production || npm install --production
           
           # Перезапускаем бота (если используется PM2)
           if command -v pm2 &> /dev/null; then
