@@ -106,4 +106,10 @@ pm2 stop veo-bot
 
 # Посмотреть логи в реальном времени
 pm2 logs veo-bot --lines 100
+```
+
+## Проверка места на диске
+
+```bash
+du -h --max-depth=1 /
 ``` 
