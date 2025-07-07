@@ -1,0 +1,69 @@
+name: Deploy VEO Bot
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'bot/package-lock.json'
+    
+    - name: Install dependencies
+      run: |
+        cd bot
+        npm ci
+    
+    - name: Run tests (if any)
+      run: |
+        cd bot
+        npm test --if-present
+    
+    - name: Deploy to server
+      if: github.ref == 'refs/heads/main'
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_PORT }}
+        script: |
+          # Переходим в директорию проекта (создаем если нет)
+          mkdir -p /home/veo-bot
+          cd /home/veo-bot
+          
+          # Если это первый деплой, клонируем репозиторий
+          if [ ! -d ".git" ]; then
+            git clone https://github.com/alxyrgin/veo-bot.git .
+          else
+            # Иначе обновляем код
+            git fetch origin main
+            git reset --hard origin/main
+          fi
+          
+          # Устанавливаем зависимости
+          cd bot
+          npm ci --production
+          
+          # Перезапускаем бота (если используется PM2)
+          if command -v pm2 &> /dev/null; then
+            pm2 restart veo-bot || pm2 start src/index.js --name veo-bot
+          else
+            # Если PM2 нет, просто убиваем старый процесс и запускаем новый
+            pkill -f "node.*veo-bot" || true
+            nohup node src/index.js > bot.log 2>&1 &
+          fi
+          
+          echo "Деплой завершен успешно!" 
