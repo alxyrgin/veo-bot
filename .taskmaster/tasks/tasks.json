@@ -436,8 +436,8 @@
           12
         ],
         "priority": "medium",
-        "details": "1. Prepare VPS environment:\n   - Install Node.js 18+\n   - Install PM2\n   - Configure firewall\n   - Setup domain and SSL certificates\n2. Create deployment script:\n   ```bash\n   #!/bin/bash\n   \n   # Pull latest changes\n   git pull origin main\n   \n   # Install dependencies\n   npm ci\n   \n   # Build admin dashboard\n   cd admin && npm ci && npm run build && cd ..\n   \n   # Update environment variables if needed\n   # cp .env.production .env\n   \n   # Restart services\n   pm2 restart ecosystem.config.js\n   ```\n3. Create PM2 configuration:\n   ```javascript\n   // ecosystem.config.js\n   module.exports = {\n     apps: [\n       {\n         name: 'telegram-bot',\n         script: 'src/bot/index.js',\n         instances: 1,\n         autorestart: true,\n         watch: false,\n         max_memory_restart: '1G',\n         env: {\n           NODE_ENV: 'production'\n         }\n       },\n       {\n         name: 'admin-api',\n         script: 'src/admin/api.js',\n         instances: 1,\n         autorestart: true,\n         watch: false,\n         max_memory_restart: '1G',\n         env: {\n           NODE_ENV: 'production'\n         }\n       }\n     ]\n   };\n   ```\n4. Setup Nginx as reverse proxy for admin dashboard\n5. Configure automatic backups for database\n6. Implement monitoring and alerting\n7. Setup logging with log rotation\n8. GitHub Actions Deployment:\n   - Fixed GitHub Actions workflow by removing npm caching that caused package-lock.json errors\n   - Corrected server path to /home/veobot/veo-bot\n   - Updated workflow to properly handle the bot/ subdirectory\n   - Configure GitHub Secrets (SERVER_HOST, SERVER_USER, SERVER_SSH_KEY, SERVER_PORT)\n   - SSH keys configured between local machine, GitHub and server\n   - Deployment structure corrected to work with bot/ subdirectory",
-        "testStrategy": "1. Test deployment script in staging environment\n2. Verify PM2 configuration works correctly and restarts services on failure\n3. Test Nginx configuration for admin dashboard\n4. Verify backup system works correctly\n5. Test monitoring and alerting by simulating failures\n6. Test GitHub Actions automated deployment by pushing a small change and verifying it deploys correctly\n7. Verify bot functionality after automated deployment",
+        "details": "1. Prepare VPS environment:\n   - Install Node.js 18+\n   - Install PM2\n   - Configure firewall\n   - Setup domain and SSL certificates\n2. Create deployment script:\n   ```bash\n   #!/bin/bash\n   \n   # Remove existing directory to avoid conflicts\n   rm -rf ~/veo-bot\n   \n   # Clone repository\n   git clone https://github.com/username/veo-bot.git\n   \n   # Navigate to correct directory\n   cd ~/veo-bot/bot\n   \n   # Install dependencies\n   npm ci\n   \n   # Build admin dashboard\n   cd admin && npm ci && npm run build && cd ..\n   \n   # Update environment variables if needed\n   # cp .env.production .env\n   \n   # Restart services\n   pm2 restart ecosystem.config.js\n   ```\n3. Create PM2 configuration:\n   ```javascript\n   // ecosystem.config.js\n   module.exports = {\n     apps: [\n       {\n         name: 'telegram-bot',\n         script: 'src/bot/index.js',\n         instances: 1,\n         autorestart: true,\n         watch: false,\n         max_memory_restart: '1G',\n         env: {\n           NODE_ENV: 'production'\n         }\n       },\n       {\n         name: 'admin-api',\n         script: 'src/admin/api.js',\n         instances: 1,\n         autorestart: true,\n         watch: false,\n         max_memory_restart: '1G',\n         env: {\n           NODE_ENV: 'production'\n         }\n       }\n     ]\n   };\n   ```\n4. Setup Nginx as reverse proxy for admin dashboard\n5. Configure automatic backups for database\n6. Implement monitoring and alerting\n7. Setup logging with log rotation\n8. GitHub Actions Deployment:\n   - Fixed GitHub Actions workflow by removing npm caching that caused package-lock.json errors\n   - Corrected server path to /home/veobot/veo-bot\n   - Updated workflow to properly handle the bot/ subdirectory\n   - Configure GitHub Secrets (SERVER_HOST, SERVER_USER, SERVER_SSH_KEY, SERVER_PORT)\n   - SSH keys configured between local machine, GitHub and server\n   - Deployment structure corrected to work with bot/ subdirectory\n   - Fixed deployment process to remove old directory before cloning\n   - Ensured correct navigation to ~/veo-bot/bot after cloning\n   - Fixed dependency installation in the correct directory\n   - Configured proper bot startup location",
+        "testStrategy": "1. Test deployment script in staging environment\n2. Verify PM2 configuration works correctly and restarts services on failure\n3. Test Nginx configuration for admin dashboard\n4. Verify backup system works correctly\n5. Test monitoring and alerting by simulating failures\n6. Test GitHub Actions automated deployment by pushing a small change and verifying it deploys correctly\n7. Verify bot functionality after automated deployment\n8. Confirm that the deployment process correctly removes old directories before cloning\n9. Verify that dependencies are installed in the correct location\n10. Check that the bot starts from the proper directory",
         "subtasks": [
           {
             "id": 1,
@@ -492,6 +492,36 @@
             "dependencies": [],
             "details": "Configure PM2 to start the bot automatically and restart it if it crashes.",
             "testStrategy": "Test PM2 configuration by manually stopping the process and verifying it restarts automatically."
+          },
+          {
+            "id": 7,
+            "title": "Fix directory structure issues in deployment",
+            "description": "Resolve issues with Git cloning into existing directories and ensure proper file structure after deployment.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "Add directory cleanup before cloning and ensure correct navigation to ~/veo-bot/bot after cloning.",
+            "testStrategy": "Verify that the deployment process correctly removes old directories and creates the proper structure."
+          },
+          {
+            "id": 8,
+            "title": "Fix dependency installation location",
+            "description": "Ensure npm installs dependencies in the correct directory structure.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "Update deployment script to navigate to the proper directory before running npm ci.",
+            "testStrategy": "Verify that all dependencies are correctly installed in the proper location."
+          },
+          {
+            "id": 9,
+            "title": "Verify complete deployment process",
+            "description": "Run a full deployment to confirm all fixes are working together properly.",
+            "status": "pending",
+            "dependencies": [
+              7,
+              8
+            ],
+            "details": "Trigger a complete deployment to verify that all the fixes (directory cleanup, proper navigation, dependency installation, and bot startup) work correctly together.",
+            "testStrategy": "Monitor the deployment process and verify each step completes successfully. Check that the bot is running properly after deployment."
           }
         ]
       },

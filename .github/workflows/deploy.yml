@@ -38,24 +38,42 @@ jobs:
         key: ${{ secrets.SERVER_SSH_KEY }}
         port: ${{ secrets.SERVER_PORT }}
         script: |
-          echo "Начинаем деплой..."
+          echo "=== НАЧАЛО ДЕПЛОЯ ==="
+          echo "Текущая папка: $(pwd)"
+          echo "Содержимое домашней папки:"
+          ls -la ~/
           
-          # Останавливаем старый процесс (если есть)
-          pm2 stop veo-bot || echo "Процесс не был запущен"
-          pm2 delete veo-bot || echo "Процесс не найден"
+          echo "=== ПРОВЕРЯЕМ GIT ==="
+          which git || echo "Git не найден!"
+          git --version || echo "Git не работает!"
           
-          # Удаляем старую папку и клонируем заново
+          echo "=== УДАЛЯЕМ СТАРУЮ ПАПКУ ==="
           rm -rf ~/veo-bot
+          echo "Папка удалена"
+          
+          echo "=== КЛОНИРУЕМ ПРОЕКТ ==="
           cd ~
           git clone https://github.com/alxyrgin/veo-bot.git
+          echo "Клонирование завершено"
           
-          # Переходим в папку с ботом
+          echo "=== ПРОВЕРЯЕМ СТРУКТУРУ ==="
+          ls -la ~/veo-bot/
+          ls -la ~/veo-bot/bot/
+          
+          echo "=== УСТАНАВЛИВАЕМ ЗАВИСИМОСТИ ==="
           cd ~/veo-bot/bot
+          npm install
           
-          # Устанавливаем зависимости
-          npm install --production
+          echo "=== ОСТАНАВЛИВАЕМ СТАРЫЙ ПРОЦЕСС ==="
+          pm2 stop veo-bot || echo "Процесс не найден"
+          pm2 delete veo-bot || echo "Процесс не найден для удаления"
           
-          # Запускаем бота через PM2
-          pm2 start src/index.js --name "veo-bot" || node src/index.js &
+          echo "=== ЗАПУСКАЕМ НОВЫЙ ПРОЦЕСС ==="
+          pm2 start src/index.js --name veo-bot
+          pm2 save
+          
+          echo "=== ПРОВЕРЯЕМ СТАТУС ==="
+          pm2 status
+          pm2 logs veo-bot --lines 10
           
           echo "Деплой завершен успешно!" 
