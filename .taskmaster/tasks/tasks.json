@@ -1,0 +1,466 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup Project Repository and Environment",
+        "description": "Initialize the project repository with Node.js 18+ and configure the development environment with necessary dependencies.",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "details": "1. Create a new Git repository\n2. Initialize Node.js project with `npm init`\n3. Install core dependencies:\n   - node-telegram-bot-api\n   - @supabase/supabase-js\n   - dotenv\n   - axios\n   - express (for webhook handling)\n   - winston (for logging)\n4. Setup project structure:\n   ```\n   /src\n     /index.js - main bot file\n     /handlers - event handlers (start, message, callback, payment)\n     /database - database operations\n     /utils - utilities (logger)\n   /config\n   ```\n5. Configure ESLint and Prettier\n6. Create .env file template with required environment variables\n7. Create comprehensive README.md with project documentation",
+        "testStrategy": "Verify project setup by running basic linting checks and ensuring all dependencies can be installed correctly. Test the environment configuration by loading environment variables from .env file. Verify basic bot functionality including user registration, welcome message, command handling, and inline buttons.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Setup package.json with dependencies",
+            "description": "Configure package.json with all necessary dependencies including node-telegram-bot-api, supabase, dotenv, axios, express, and winston.",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Create environment variables template",
+            "description": "Create env.example file with all required environment variables.",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement bot architecture",
+            "description": "Create the core bot architecture with handlers for commands, messages, and payments.",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Configure logging",
+            "description": "Set up Winston for application logging.",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Set up database connection",
+            "description": "Implement Supabase database connection and basic operations.",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Create documentation",
+            "description": "Add comprehensive documentation in README.md.",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Implement user registration",
+            "description": "Create functionality to register new users in the database.",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Implement welcome message",
+            "description": "Add welcome message handler for new users.",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 9,
+            "title": "Add command and inline button handling",
+            "description": "Implement handlers for bot commands and inline keyboard buttons.",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 10,
+            "title": "Implement prompt handling for video generation",
+            "description": "Create functionality to accept and process prompts for video generation.",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 11,
+            "title": "Add balance and credit purchase interface",
+            "description": "Implement balance display and interface for purchasing credits.",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 12,
+            "title": "Implement referral program",
+            "description": "Create functionality for the referral program.",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Setup Supabase Database Schema",
+        "description": "Create and configure Supabase database with required tables for users, transactions, and video generations.",
+        "status": "done",
+        "dependencies": [
+          1
+        ],
+        "priority": "high",
+        "details": "1. Create a Supabase project\n2. Define database schema with the following tables:\n   - users:\n     ```sql\n     CREATE TABLE users (\n       id SERIAL PRIMARY KEY,\n       telegram_id BIGINT UNIQUE NOT NULL,\n       username TEXT,\n       first_name TEXT,\n       last_name TEXT,\n       credits INTEGER DEFAULT 0,\n       referral_code TEXT UNIQUE,\n       referred_by TEXT,\n       created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\n       updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n     );\n     ```\n   - transactions:\n     ```sql\n     CREATE TABLE transactions (\n       id SERIAL PRIMARY KEY,\n       user_id BIGINT REFERENCES users(telegram_id),\n       type TEXT NOT NULL, -- 'purchase', 'generation', 'referral'\n       amount INTEGER NOT NULL,\n       payment_id TEXT,\n       created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n     );\n     ```\n   - video_generations:\n     ```sql\n     CREATE TABLE video_generations (\n       id SERIAL PRIMARY KEY,\n       user_id BIGINT REFERENCES users(telegram_id),\n       prompt TEXT NOT NULL,\n       mode TEXT NOT NULL, -- 'fast', 'premium'\n       status TEXT NOT NULL, -- 'pending', 'completed', 'failed'\n       video_url TEXT,\n       credits_used INTEGER NOT NULL,\n       created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),\n       completed_at TIMESTAMP WITH TIME ZONE\n     );\n     ```\n3. Setup row-level security policies\n4. Create database indexes for frequent queries\n\n**Implementation Status:**\n- All SQL migrations created in bot/database/migrations/:\n  - 001_create_users_table.sql\n  - 002_create_transactions_table.sql\n  - 003_create_video_generations_table.sql\n  - 004_setup_security_policies.sql\n- Complete schema.sql file for quick deployment\n- README.md with database setup instructions\n- models.js module with database functions for:\n  - User creation and retrieval\n  - Credit management\n  - Transaction handling\n  - Video generation management\n  - Admin statistics\n- Security features implemented:\n  - Row Level Security (RLS) for all tables\n  - User data isolation\n  - Service role with full access\n- Performance optimizations:\n  - Indexes for frequent queries\n  - Triggers for automatic last_active updates\n  - Data integrity constraints",
+        "testStrategy": "Test database connection and CRUD operations for each table. Verify constraints, foreign keys, and default values work as expected. Create test data and validate queries perform efficiently. Test the implemented models.js functions to ensure they correctly interact with the database. Verify RLS policies are working as intended by testing access with different user roles.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create SQL migrations",
+            "description": "Create SQL migration files for all required tables and security policies",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Create schema.sql for quick deployment",
+            "description": "Compile all migrations into a single schema.sql file",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement database models module",
+            "description": "Create models.js with functions for database operations",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Setup security policies",
+            "description": "Implement Row Level Security and access controls",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Create database documentation",
+            "description": "Write README.md with setup instructions and schema details",
+            "status": "completed",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Create Supabase project and apply migrations",
+            "description": "Set up the actual Supabase project and run the migrations",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Implement Basic Telegram Bot Structure",
+        "description": "Create the core Telegram bot structure with command handling and basic user interaction flow.",
+        "status": "done",
+        "dependencies": [
+          1
+        ],
+        "priority": "high",
+        "details": "1. Register a new bot with BotFather and obtain API token\n2. Implement bot initialization:\n   ```javascript\n   const TelegramBot = require('node-telegram-bot-api');\n   const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });\n   ```\n3. Implement command handlers:\n   - /start - Welcome message with referral system integration\n   - /help - Display available commands\n   - /balance - Check user credits and transaction history\n   - /generate - Start video generation flow\n   - /buy - Display payment options\n   - /referral - Show referral information\n4. Implement comprehensive callback handler for:\n   - Video creation with mode selection\n   - Balance display and transaction history\n   - Credit purchase with package options\n   - Referral program management\n   - Help and tutorial sections\n   - Menu navigation\n5. Create smart message handler for:\n   - Text prompt recognition\n   - Voice message processing (placeholder)\n   - Generation options display\n   - Prompt encoding in callback_data\n6. Integrate with database for:\n   - User creation and verification\n   - Credit management\n   - Video generation logging\n   - Transaction processing\n7. Implement video generation emulation:\n   - Credit verification\n   - Database recording\n   - Process simulation (30 seconds)\n   - Completion notification\n8. Create middleware for user authentication and tracking\n9. Implement error handling and logging\n10. Setup webhook for production environment",
+        "testStrategy": "Test the complete bot functionality including:\n1. User registration and authentication\n2. Command handling for all implemented commands\n3. Callback handling for all menu options\n4. Message processing for text and voice inputs\n5. Database integration for user management, credits, and transactions\n6. Video generation simulation flow\n7. Referral system functionality\n8. Error handling under various conditions\n9. Menu navigation and user experience\n\nVerify all features work as expected with appropriate responses and state management.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Register bot with BotFather",
+            "description": "Create new bot via BotFather and obtain API token for development",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement basic command handlers",
+            "description": "Create handlers for /start, /help, /balance, /generate, /buy, and /referral commands",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement callback handler system",
+            "description": "Create comprehensive callback handling for all interactive menu options",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Develop smart message handler",
+            "description": "Implement handler for text prompts, voice messages, and encoding prompts in callback data",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Integrate database functionality",
+            "description": "Connect bot to database for user management, credits, video generation logging, and transactions",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Implement video generation simulation",
+            "description": "Create emulation of video generation process with credit verification and notifications",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Setup error handling and logging",
+            "description": "Implement comprehensive error handling throughout the bot",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Configure production webhook",
+            "description": "Setup webhook for production environment deployment",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 9,
+            "title": "Conduct comprehensive testing",
+            "description": "Test all implemented functionality including user flows, commands, callbacks, and error handling",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Implement User Registration and Management",
+        "description": "Create functionality to register new users, store their information in Supabase, and manage user sessions.",
+        "details": "1. Implement user registration flow when user starts the bot:\n   ```javascript\n   bot.onText(/\\/start/, async (msg) => {\n     const chatId = msg.chat.id;\n     const user = await db.getUserByTelegramId(chatId);\n     \n     if (!user) {\n       // Create new user\n       const referralCode = generateReferralCode();\n       await db.createUser({\n         telegram_id: chatId,\n         username: msg.from.username,\n         first_name: msg.from.first_name,\n         last_name: msg.from.last_name,\n         credits: 1, // Free first generation\n         referral_code: referralCode\n       });\n       \n       bot.sendMessage(chatId, `Welcome to VEO 3 Video Generator Bot! You've received 1 free credit for your first generation.`);\n     } else {\n       bot.sendMessage(chatId, `Welcome back! You have ${user.credits} credits available.`);\n     }\n   });\n   ```\n2. Extract referral code from start command if present\n3. Implement function to check and update user information\n4. Create utility functions for user credit management\n5. Implement user session tracking for multi-step operations",
+        "testStrategy": "Test user registration flow with various Telegram user objects. Verify users are correctly stored in the database with all required fields. Test referral code extraction and handling. Verify credit management functions work correctly.",
+        "priority": "high",
+        "dependencies": [
+          2,
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Implement Google VEO 3 API Integration",
+        "description": "Integrate with Google Cloud Vertex AI to access VEO 3 API for video generation with both Fast and Premium modes.",
+        "details": "1. Setup Google Cloud project and enable Vertex AI API\n2. Implement API client for VEO 3:\n   ```javascript\n   const { VertexAI } = require('@google-cloud/vertexai');\n   \n   class VEO3Client {\n     constructor(apiKey, projectId, location = 'us-central1') {\n       this.vertexAI = new VertexAI({ project: projectId, location });\n       this.generativeModel = this.vertexAI.preview.getGenerativeModel({\n         model: 'veo-3',\n         generation_config: {\n           max_output_tokens: 2048,\n         },\n       });\n     }\n     \n     async generateVideo(prompt, mode = 'fast') {\n       try {\n         const generationConfig = {\n           mode: mode, // 'fast' or 'premium'\n           maxOutputTokens: mode === 'fast' ? 256 : 512,\n         };\n         \n         const result = await this.generativeModel.generateContent({\n           contents: [{ role: 'user', parts: [{ text: prompt }] }],\n         }, generationConfig);\n         \n         return {\n           success: true,\n           videoUrl: result.response.candidates[0].content.parts[0].videoUrl,\n         };\n       } catch (error) {\n         console.error('VEO3 API error:', error);\n         return { success: false, error: error.message };\n       }\n     }\n   }\n   ```\n3. Implement API key rotation mechanism to optimize usage\n4. Create queue system for handling multiple generation requests\n5. Implement retry logic for failed API calls\n6. Add prompt optimization using OpenRouter API",
+        "testStrategy": "Test API integration with sample prompts for both Fast and Premium modes. Verify video generation works correctly and returns valid video URLs. Test error handling and retry logic by simulating API failures. Validate API key rotation works as expected.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Implement Video Generation Flow",
+        "description": "Create the complete flow for handling user prompts, generating videos, and delivering results to users.",
+        "details": "1. Implement prompt handling from text messages:\n   ```javascript\n   bot.on('text', async (msg) => {\n     if (msg.text.startsWith('/')) return; // Skip commands\n     \n     const chatId = msg.chat.id;\n     const user = await db.getUserByTelegramId(chatId);\n     \n     if (!user) {\n       bot.sendMessage(chatId, 'Please start the bot with /start first.');\n       return;\n     }\n     \n     // Check if in generation mode\n     if (userState[chatId] === 'awaiting_prompt') {\n       await handleVideoGeneration(chatId, user, msg.text);\n     }\n   });\n   ```\n2. Implement voice message handling for prompts\n3. Create generation mode selection (Fast/Premium)\n4. Implement credit deduction logic\n5. Create progress tracking and notification system\n6. Implement video delivery and storage\n7. Add generation history tracking in database",
+        "testStrategy": "Test the complete video generation flow with various prompts. Verify credit deduction works correctly for different modes. Test voice message handling and transcription. Verify progress notifications are sent correctly. Test error handling during generation process.",
+        "priority": "high",
+        "dependencies": [
+          4,
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Implement Telegram Payments Integration",
+        "description": "Integrate Telegram Payments API to allow users to purchase credits using Russian payment methods.",
+        "details": "1. Register with Telegram Payments and set up a provider\n2. Implement payment initialization:\n   ```javascript\n   bot.onText(/\\/buy/, async (msg) => {\n     const chatId = msg.chat.id;\n     \n     const keyboard = {\n       inline_keyboard: [\n         [{ text: '5 credits - 199₽', callback_data: 'buy_5_199' }],\n         [{ text: '15 credits - 499₽', callback_data: 'buy_15_499' }],\n         [{ text: '35 credits - 999₽', callback_data: 'buy_35_999' }],\n         [{ text: '75 credits - 1999₽', callback_data: 'buy_75_1999' }]\n       ]\n     };\n     \n     bot.sendMessage(chatId, 'Choose a credit package:', { reply_markup: keyboard });\n   });\n   ```\n3. Handle payment callbacks:\n   ```javascript\n   bot.on('callback_query', async (query) => {\n     if (query.data.startsWith('buy_')) {\n       const [_, credits, price] = query.data.split('_');\n       await initializePayment(query.message.chat.id, parseInt(credits), parseInt(price));\n     }\n   });\n   ```\n4. Implement payment processing and verification\n5. Create credit addition logic after successful payment\n6. Implement transaction recording in database\n7. Add payment receipt generation",
+        "testStrategy": "Test payment flow with test payment provider. Verify invoice creation works correctly with all pricing tiers. Test successful and failed payment scenarios. Verify credits are correctly added after successful payment. Test transaction recording in database.",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Implement Referral System",
+        "description": "Create a referral system allowing users to invite friends and earn credits.",
+        "details": "1. Generate unique referral codes for each user\n2. Create referral link format: `https://t.me/YourBotUsername?start=REF_CODE`\n3. Implement referral tracking:\n   ```javascript\n   bot.onText(/\\/start (.+)/, async (msg, match) => {\n     const chatId = msg.chat.id;\n     const referralCode = match[1];\n     \n     const user = await db.getUserByTelegramId(chatId);\n     if (!user) {\n       // New user with referral\n       const referrer = await db.getUserByReferralCode(referralCode);\n       if (referrer) {\n         // Create new user with referral\n         await db.createUser({\n           telegram_id: chatId,\n           username: msg.from.username,\n           first_name: msg.from.first_name,\n           last_name: msg.from.last_name,\n           credits: 2, // Bonus for using referral\n           referral_code: generateReferralCode(),\n           referred_by: referralCode\n         });\n         \n         // Add credits to referrer\n         await db.addCreditsToUser(referrer.telegram_id, 3);\n         await db.recordTransaction({\n           user_id: referrer.telegram_id,\n           type: 'referral',\n           amount: 3\n         });\n         \n         // Notify referrer\n         bot.sendMessage(referrer.telegram_id, `Someone joined using your referral link! You received 3 credits.`);\n         \n         bot.sendMessage(chatId, `Welcome to VEO 3 Video Generator Bot! You've received 2 free credits for joining via a referral link.`);\n       }\n     }\n   });\n   ```\n4. Implement referral status command\n5. Create referral statistics tracking\n6. Add referral leaderboard functionality",
+        "testStrategy": "Test referral link generation and tracking. Verify credits are correctly awarded to both referrer and referee. Test referral statistics tracking and reporting. Verify referral leaderboard functionality works correctly.",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Implement User Balance and Transaction History",
+        "description": "Create functionality for users to check their credit balance and view transaction history.",
+        "details": "1. Implement balance checking command:\n   ```javascript\n   bot.onText(/\\/balance/, async (msg) => {\n     const chatId = msg.chat.id;\n     const user = await db.getUserByTelegramId(chatId);\n     \n     if (!user) {\n       bot.sendMessage(chatId, 'Please start the bot with /start first.');\n       return;\n     }\n     \n     bot.sendMessage(chatId, `Your current balance: ${user.credits} credits`);\n   });\n   ```\n2. Implement transaction history command:\n   ```javascript\n   bot.onText(/\\/history/, async (msg) => {\n     const chatId = msg.chat.id;\n     const transactions = await db.getUserTransactions(chatId, 10); // Last 10 transactions\n     \n     if (transactions.length === 0) {\n       bot.sendMessage(chatId, 'You have no transaction history yet.');\n       return;\n     }\n     \n     let message = 'Your recent transactions:\\n\\n';\n     transactions.forEach(t => {\n       const sign = t.type === 'purchase' || t.type === 'referral' ? '+' : '-';\n       message += `${formatDate(t.created_at)} | ${t.type} | ${sign}${t.amount} credits\\n`;\n     });\n     \n     bot.sendMessage(chatId, message);\n   });\n   ```\n3. Implement generation history command\n4. Create detailed transaction view\n5. Add pagination for transaction history",
+        "testStrategy": "Test balance checking with various user states. Verify transaction history display works correctly with different transaction types. Test pagination for users with many transactions. Verify generation history display shows correct information.",
+        "priority": "medium",
+        "dependencies": [
+          4,
+          6,
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Implement Prompt Optimization with OpenRouter API",
+        "description": "Integrate OpenRouter API to optimize user prompts before sending them to VEO 3 API.",
+        "details": "1. Setup OpenRouter API client:\n   ```javascript\n   const axios = require('axios');\n   \n   async function optimizePrompt(prompt) {\n     try {\n       const response = await axios.post(\n         'https://openrouter.ai/api/v1/chat/completions',\n         {\n           model: 'anthropic/claude-3-opus',\n           messages: [\n             {\n               role: 'system',\n               content: 'You are an expert at optimizing prompts for video generation with VEO 3. Enhance the user prompt to create more detailed, visually appealing videos while preserving the original intent.'\n             },\n             {\n               role: 'user',\n               content: `Optimize this video generation prompt: \"${prompt}\"`\n             }\n           ],\n           max_tokens: 1024\n         },\n         {\n           headers: {\n             'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,\n             'Content-Type': 'application/json'\n           }\n         }\n       );\n       \n       return response.data.choices[0].message.content;\n     } catch (error) {\n       console.error('Prompt optimization error:', error);\n       return prompt; // Return original prompt if optimization fails\n     }\n   }\n   ```\n2. Integrate prompt optimization into video generation flow\n3. Implement optimization toggle for users\n4. Add prompt templates for common video types\n5. Create prompt history for reuse",
+        "testStrategy": "Test prompt optimization with various input prompts. Compare original and optimized prompts for quality improvement. Verify error handling returns original prompt when optimization fails. Test optimization toggle functionality.",
+        "priority": "medium",
+        "dependencies": [
+          5,
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Implement Admin Dashboard Backend API",
+        "description": "Create backend API endpoints for the admin dashboard to manage users, view statistics, and configure bot settings.",
+        "details": "1. Setup Express.js server for admin API:\n   ```javascript\n   const express = require('express');\n   const cors = require('cors');\n   const jwt = require('jsonwebtoken');\n   \n   const app = express();\n   app.use(cors());\n   app.use(express.json());\n   \n   // Authentication middleware\n   const authenticate = (req, res, next) => {\n     const token = req.headers.authorization?.split(' ')[1];\n     if (!token) return res.status(401).json({ error: 'Unauthorized' });\n     \n     try {\n       const decoded = jwt.verify(token, process.env.JWT_SECRET);\n       req.user = decoded;\n       next();\n     } catch (error) {\n       return res.status(401).json({ error: 'Invalid token' });\n     }\n   };\n   \n   // Admin login\n   app.post('/api/login', async (req, res) => {\n     const { username, password } = req.body;\n     if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {\n       const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '24h' });\n       res.json({ token });\n     } else {\n       res.status(401).json({ error: 'Invalid credentials' });\n     }\n   });\n   \n   // Protected routes\n   app.get('/api/users', authenticate, async (req, res) => {\n     const users = await db.getAllUsers();\n     res.json(users);\n   });\n   \n   app.get('/api/transactions', authenticate, async (req, res) => {\n     const transactions = await db.getAllTransactions();\n     res.json(transactions);\n   });\n   \n   app.get('/api/statistics', authenticate, async (req, res) => {\n     // Get various statistics\n     const stats = await db.getStatistics();\n     res.json(stats);\n   });\n   \n   app.put('/api/users/:id/credits', authenticate, async (req, res) => {\n     const { id } = req.params;\n     const { credits } = req.body;\n     await db.setUserCredits(id, credits);\n     res.json({ success: true });\n   });\n   \n   app.get('/api/settings', authenticate, async (req, res) => {\n     const settings = await db.getSettings();\n     res.json(settings);\n   });\n   \n   app.put('/api/settings', authenticate, async (req, res) => {\n     await db.updateSettings(req.body);\n     res.json({ success: true });\n   });\n   \n   const PORT = process.env.ADMIN_API_PORT || 3001;\n   app.listen(PORT, () => console.log(`Admin API running on port ${PORT}`));\n   ```\n2. Implement database queries for admin operations\n3. Create authentication and authorization system\n4. Implement API key management endpoints\n5. Add user management endpoints\n6. Create statistics and reporting endpoints",
+        "testStrategy": "Test API endpoints with various request parameters. Verify authentication and authorization work correctly. Test database queries return expected results. Verify error handling for invalid requests. Test API key management functionality.",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          4,
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Implement Admin Dashboard Frontend",
+        "description": "Create a React-based admin dashboard for managing the bot, users, and viewing statistics.",
+        "details": "1. Setup React project with Create React App or Vite\n2. Implement authentication flow with JWT\n3. Create dashboard layout with navigation:\n   - Users management\n   - Transactions history\n   - Video generations\n   - Statistics\n   - Settings\n4. Implement users management page:\n   ```jsx\n   function UsersPage() {\n     const [users, setUsers] = useState([]);\n     const [loading, setLoading] = useState(true);\n     \n     useEffect(() => {\n       async function fetchUsers() {\n         try {\n           const response = await api.get('/users');\n           setUsers(response.data);\n         } catch (error) {\n           console.error('Error fetching users:', error);\n         } finally {\n           setLoading(false);\n         }\n       }\n       \n       fetchUsers();\n     }, []);\n     \n     const handleCreditChange = async (userId, credits) => {\n       try {\n         await api.put(`/users/${userId}/credits`, { credits });\n         setUsers(users.map(user => \n           user.telegram_id === userId ? { ...user, credits } : user\n         ));\n       } catch (error) {\n         console.error('Error updating credits:', error);\n       }\n     };\n     \n     if (loading) return <div>Loading...</div>;\n     \n     return (\n       <div>\n         <h1>Users Management</h1>\n         <table>\n           <thead>\n             <tr>\n               <th>ID</th>\n               <th>Username</th>\n               <th>Credits</th>\n               <th>Referrals</th>\n               <th>Joined</th>\n               <th>Actions</th>\n             </tr>\n           </thead>\n           <tbody>\n             {users.map(user => (\n               <tr key={user.telegram_id}>\n                 <td>{user.telegram_id}</td>\n                 <td>{user.username || 'N/A'}</td>\n                 <td>\n                   <input \n                     type=\"number\" \n                     value={user.credits} \n                     onChange={e => handleCreditChange(user.telegram_id, parseInt(e.target.value))}\n                   />\n                 </td>\n                 <td>{user.referral_count || 0}</td>\n                 <td>{new Date(user.created_at).toLocaleDateString()}</td>\n                 <td>\n                   <button onClick={() => viewUserDetails(user.telegram_id)}>Details</button>\n                 </td>\n               </tr>\n             ))}\n           </tbody>\n         </table>\n       </div>\n     );\n   }\n   ```\n5. Implement transactions and statistics pages\n6. Create settings management page\n7. Implement responsive design for mobile and desktop",
+        "testStrategy": "Test dashboard functionality with mock API responses. Verify authentication flow works correctly. Test user management operations like updating credits. Verify statistics display accurate information. Test responsive design on various screen sizes.",
+        "priority": "medium",
+        "dependencies": [
+          11
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Implement API Key Rotation System",
+        "description": "Create a system to rotate API keys for VEO 3 and OpenRouter to optimize usage and costs.",
+        "details": "1. Create API key management in database:\n   ```sql\n   CREATE TABLE api_keys (\n     id SERIAL PRIMARY KEY,\n     service TEXT NOT NULL, -- 'veo3', 'openrouter'\n     api_key TEXT NOT NULL,\n     is_active BOOLEAN DEFAULT true,\n     usage_count INTEGER DEFAULT 0,\n     last_used TIMESTAMP WITH TIME ZONE,\n     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n   );\n   ```\n2. Implement API key selection logic:\n   ```javascript\n   async function getApiKey(service) {\n     // Get least used active key\n     const key = await db.query(`\n       SELECT * FROM api_keys \n       WHERE service = $1 AND is_active = true \n       ORDER BY usage_count ASC \n       LIMIT 1\n     `, [service]);\n     \n     if (!key) {\n       throw new Error(`No active ${service} API key available`);\n     }\n     \n     // Update usage count\n     await db.query(`\n       UPDATE api_keys \n       SET usage_count = usage_count + 1, \n           last_used = NOW() \n       WHERE id = $1\n     `, [key.id]);\n     \n     return key.api_key;\n   }\n   ```\n3. Implement API key rotation based on usage limits\n4. Create admin interface for managing API keys\n5. Implement usage tracking and reporting\n6. Add automatic disabling of keys that return errors",
+        "testStrategy": "Test API key selection logic with multiple keys. Verify usage counting works correctly. Test rotation logic when keys reach usage limits. Verify error handling disables problematic keys. Test admin interface for key management.",
+        "priority": "medium",
+        "dependencies": [
+          5,
+          10,
+          11
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Implement Production Deployment",
+        "description": "Set up production deployment on VPS with PM2 for process management and monitoring.",
+        "details": "1. Prepare VPS environment:\n   - Install Node.js 18+\n   - Install PM2\n   - Configure firewall\n   - Setup domain and SSL certificates\n2. Create deployment script:\n   ```bash\n   #!/bin/bash\n   \n   # Pull latest changes\n   git pull origin main\n   \n   # Install dependencies\n   npm ci\n   \n   # Build admin dashboard\n   cd admin && npm ci && npm run build && cd ..\n   \n   # Update environment variables if needed\n   # cp .env.production .env\n   \n   # Restart services\n   pm2 restart ecosystem.config.js\n   ```\n3. Create PM2 configuration:\n   ```javascript\n   // ecosystem.config.js\n   module.exports = {\n     apps: [\n       {\n         name: 'telegram-bot',\n         script: 'src/bot/index.js',\n         instances: 1,\n         autorestart: true,\n         watch: false,\n         max_memory_restart: '1G',\n         env: {\n           NODE_ENV: 'production'\n         }\n       },\n       {\n         name: 'admin-api',\n         script: 'src/admin/api.js',\n         instances: 1,\n         autorestart: true,\n         watch: false,\n         max_memory_restart: '1G',\n         env: {\n           NODE_ENV: 'production'\n         }\n       }\n     ]\n   };\n   ```\n4. Setup Nginx as reverse proxy for admin dashboard\n5. Configure automatic backups for database\n6. Implement monitoring and alerting\n7. Setup logging with log rotation",
+        "testStrategy": "Test deployment script in staging environment. Verify PM2 configuration works correctly and restarts services on failure. Test Nginx configuration for admin dashboard. Verify backup system works correctly. Test monitoring and alerting by simulating failures.",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          6,
+          7,
+          11,
+          12
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "Implement Analytics and Monitoring",
+        "description": "Set up analytics tracking, error monitoring, and performance metrics for the bot and admin dashboard.",
+        "details": "1. Implement basic analytics tracking:\n   ```javascript\n   async function trackEvent(userId, eventType, metadata = {}) {\n     await db.query(`\n       INSERT INTO analytics (user_id, event_type, metadata, created_at)\n       VALUES ($1, $2, $3, NOW())\n     `, [userId, eventType, JSON.stringify(metadata)]);\n   }\n   ```\n2. Create analytics schema:\n   ```sql\n   CREATE TABLE analytics (\n     id SERIAL PRIMARY KEY,\n     user_id BIGINT REFERENCES users(telegram_id),\n     event_type TEXT NOT NULL,\n     metadata JSONB DEFAULT '{}'::jsonb,\n     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n   );\n   ```\n3. Implement error tracking and reporting\n4. Create performance monitoring for API calls\n5. Setup daily/weekly reports generation\n6. Implement user retention metrics\n7. Create conversion funnel analysis",
+        "testStrategy": "Test analytics tracking with various event types. Verify data is correctly stored in the database. Test error tracking by simulating errors. Verify performance monitoring accurately measures API call times. Test report generation with sample data.",
+        "priority": "low",
+        "dependencies": [
+          6,
+          7,
+          11,
+          12
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-07-07T08:31:15.670Z",
+      "updated": "2025-07-07T11:41:47.926Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
