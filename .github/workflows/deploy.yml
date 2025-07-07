@@ -18,7 +18,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        # Убираем кеширование пока, чтобы избежать проблем с путями
     
     - name: Install dependencies
       run: |
@@ -52,7 +51,7 @@ jobs:
             git reset --hard origin/main
           fi
           
-          # Устанавливаем зависимости
+          # Переходим в папку бота и устанавливаем зависимости
           cd bot
           npm ci --production || npm install --production
           
