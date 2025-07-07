@@ -38,30 +38,24 @@ jobs:
         key: ${{ secrets.SERVER_SSH_KEY }}
         port: ${{ secrets.SERVER_PORT }}
         script: |
-          # Переходим в директорию проекта (создаем если нет)
-          mkdir -p /home/veobot/veo-bot
-          cd /home/veobot/veo-bot
+          echo "Начинаем деплой..."
           
-          # Если это первый деплой, клонируем репозиторий
-          if [ ! -d ".git" ]; then
-            git clone https://github.com/alxyrgin/veo-bot.git .
-          else
-            # Иначе обновляем код
-            git fetch origin main
-            git reset --hard origin/main
-          fi
+          # Останавливаем старый процесс (если есть)
+          pm2 stop veo-bot || echo "Процесс не был запущен"
+          pm2 delete veo-bot || echo "Процесс не найден"
           
-          # Переходим в папку бота и устанавливаем зависимости
-          cd bot
-          npm ci --production || npm install --production
+          # Удаляем старую папку и клонируем заново
+          rm -rf ~/veo-bot
+          cd ~
+          git clone https://github.com/alxyrgin/veo-bot.git
           
-          # Перезапускаем бота (если используется PM2)
-          if command -v pm2 &> /dev/null; then
-            pm2 restart veo-bot || pm2 start src/index.js --name veo-bot
-          else
-            # Если PM2 нет, просто убиваем старый процесс и запускаем новый
-            pkill -f "node.*veo-bot" || true
-            nohup node src/index.js > bot.log 2>&1 &
-          fi
+          # Переходим в папку с ботом
+          cd ~/veo-bot/bot
+          
+          # Устанавливаем зависимости
+          npm install --production
+          
+          # Запускаем бота через PM2
+          pm2 start src/index.js --name "veo-bot" || node src/index.js &
           
           echo "Деплой завершен успешно!" 
