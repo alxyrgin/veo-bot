@@ -18,7 +18,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
+        # Убираем кеширование пока, чтобы избежать проблем с путями
     
     - name: Install dependencies
       run: |
@@ -40,8 +40,8 @@ jobs:
         port: ${{ secrets.SERVER_PORT }}
         script: |
           # Переходим в директорию проекта (создаем если нет)
-          mkdir -p /home/veo-bot
-          cd /home/veo-bot
+          mkdir -p /home/veobot/veo-bot
+          cd /home/veobot/veo-bot
           
           # Если это первый деплой, клонируем репозиторий
           if [ ! -d ".git" ]; then

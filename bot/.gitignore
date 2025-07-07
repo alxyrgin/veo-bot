@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+temp/
+uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Runtime files
+*.pid
+*.seed
+
+# Coverage
+coverage/
+
+# Build output
+dist/
+build/
